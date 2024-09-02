@@ -1,95 +1,120 @@
 import { useState } from "react";
 import "./form.css";
 
-function Form({ initialData, onSubmit }) {
+function Form({ initialData, onSubmit, titulo, placeholder_1, placeholder_2, placeholder_3 }) {
   // Estado inicial é definido via props
   const [formData, setFormData] = useState(initialData);
+  const [errors, setErrors] = useState({});
 
-  // Atualiza o estado ao alterar algum campo do formulário
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    setErrors({
+      ...errors,
+      [e.target.name]: "",
+    });
   };
 
-  // Lida com o envio do formulário
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.username) {
+      newErrors.username = "O nome de usuário é obrigatório";
+    }
+
+    if (!formData.email) {
+      newErrors.email = "O email é obrigatório";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Formato de email inválido";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "A senha é obrigatória";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "A senha deve ter pelo menos 6 caracteres";
+    }
+
+    return newErrors;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData); // Chama a função passada via props ao submeter
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      console.log(formData);
+      onSubmit(formData);
+    }
   };
 
   return (
-//     <form onSubmit={handleSubmit} className="formContainer">
-//       <div className="formGroup">
-//         <label>Nome:</label>
-//         <input
-//           type="text"
-//           name="name"
-//           value={formData.name}
-//           onChange={handleChange}
-//         />
-//       </div>
+    <div id="form-ui">
+      <form onSubmit={handleSubmit} id="form">
+        <div id="form-body">
+          <div id="welcome-lines">
+            <div id="welcome-line-1">{titulo}</div>
+          </div>
 
-//       <div className="formGroup">
-//         <label>E-mail:</label>
-//         <input
-//           type="email"
-//           name="email"
-//           value={formData.email}
-//           onChange={handleChange}
-//         />
-//       </div>
+          <section className="bg-stars">
+            <span className="star"></span>
+            <span className="star"></span>
+            <span className="star"></span>
+            <span className="star"></span>
+          </section>
 
-//       <div className="formGroup">
-//         <label>Telefone:</label>
-//         <input
-//           type="tel"
-//           name="phone"
-//           value={formData.phone}
-//           onChange={handleChange}
-//         />
-//       </div>
+          <div id="input-area">
+            <div className="form-inp">
+              <input
+                name="username"
+                placeholder={placeholder_1}
+                type="text"
+                value={formData.username || ""}
+                onChange={handleChange}
+              />
+              {errors.username && (
+                <div className="error">{errors.username}</div>
+              )}
+            </div>
+            <div className="form-inp">
+              <input
+                name="email"
+                placeholder={placeholder_2}
+                type="text"
+                value={formData.email || ""}
+                onChange={handleChange}
+              />
+              {errors.email && (
+                <div className="error">{errors.email}</div>
+              )}
+            </div>
+            <div className="form-inp">
+              <input
+                name="password"
+                placeholder={placeholder_3}
+                type="password"
+                value={formData.password || ""}
+                onChange={handleChange}
+              />
+              {errors.password && (
+                <div className="error">{errors.password}</div>
+              )}
+            </div>
+          </div>
+          <div id="submit-button-cvr">
+            <button id="submit-button" type="submit">
+              Login
+            </button>
+          </div>
 
-//       <button type="submit">Cadastrar</button>
-//     </form>
 
-<div id="form-ui">
-<form onSubmit={handleSubmit} id="form">
-  <div id="form-body">
-    <div id="welcome-lines">
-      <div id="welcome-line-1">Spotify</div>
-      <div id="welcome-line-2">Welcome Back, Loyd</div>
+
+        </div>
+      </form>
     </div>
-
-    <section className="bg-stars">
-      <span className="star"></span>
-      <span className="star"></span>
-      <span className="star"></span>
-      <span className="star"></span>
-    </section>
-
-    <div id="input-area">
-      <div className="form-inp">
-        <input placeholder="Email Address" type="text" />
-      </div>
-      <div className="form-inp">
-        <input placeholder="Password" type="password" />
-      </div>
-    </div>
-    <div id="submit-button-cvr">
-      <button id="submit-button" type="submit">
-        Login
-      </button>
-    </div>
-    <div id="forgot-pass">
-      <a href="#">Forgot password?</a>
-    </div>
-    <div id="bar"></div>
-  </div>
-</form>
-</div>
-
   );
 }
 
